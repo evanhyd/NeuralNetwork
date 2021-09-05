@@ -5,7 +5,7 @@
 
 Connection::Connection()
 {
-	srand(time_t(NULL));
+	srand(time(nullptr));
 
 	this->weight = rand() / double(RAND_MAX);
 	this->diff_weight = rand() / double(RAND_MAX);

@@ -8,15 +8,15 @@ int main()
 	/*
 	
 
-	3000
+	1000
 	3
-	2 10 1
+	2 4 1
 
 
 	*/
 
 	std::cin.tie(nullptr)->sync_with_stdio(false);
-	srand(time_t(NULL));
+	srand(time(nullptr));
 
 	int N, M; std::cin >> M >> N;
 	std::vector<int> topology(N);
@@ -34,7 +34,7 @@ int main()
 
 		for (int j = 0; j < input.size(); ++j)
 		{
-			input[j] = rand() % 2;
+			input[j] = j;
 			std::cout << "input: " << input[j]<<"   ";
 		}
 
@@ -44,16 +44,20 @@ int main()
 		{
 			target.front() = int(target.front()) ^ int(input[j]);
 		}
-		std::cout << "target: " << target.front() << " ";
+		 std::cout << "target: " << target.front() << " ";
 
 
-		model.FeedForward(input);
+
+		model.ForwardPropagate(input);
 		predict = model.GetResult();
 		std::cout << "predict: ";
 		for (auto val : predict)
 		{
 			std::cout << val << ' ';
 		}
+
+
+
 		model.BackPropagate(target);
 	}
 	std::cout << "Training completed!\n";
@@ -67,7 +71,7 @@ int main()
 		}
 
 
-		model.FeedForward(input);
+		model.ForwardPropagate(input);
 		predict = model.GetResult();
 		std::cout << "predict:\n";
 		for (auto val : predict)

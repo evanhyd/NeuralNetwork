@@ -23,7 +23,7 @@ public:
 
 private:
 	static constexpr double LEARNING_RATE = 0.15; //eta
-	static constexpr double MOMENTUM_RATE = 0.5; //alpha
+	static constexpr double MOMENTUM_RATE = 0.3; //alpha
 	static double TransferFunction(double value);
 	static double TransferFunctionDerv(double value);
 };

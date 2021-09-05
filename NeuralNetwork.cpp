@@ -25,7 +25,7 @@ NeuralNetwork::NeuralNetwork(const std::vector<int>& topology) : RMS(0.0)
 }
 
 
-void NeuralNetwork::FeedForward(const std::vector<double>& input)
+void NeuralNetwork::ForwardPropagate(const std::vector<double>& input)
 {
 	//-1 to account for the bias neuron
 	assert(input.size() == this->layers.front().size() - 1);
