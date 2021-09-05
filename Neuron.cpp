@@ -1,7 +1,8 @@
 #include "Neuron.h"
 #include <algorithm>
+#include <iostream>
 
-Neuron::Neuron(int new_neuron_index, int output_num) : neuron_index(new_neuron_index), value(0)
+Neuron::Neuron(int new_neuron_index, int output_num) : this_neuron_index(new_neuron_index), value(0.0), gradient(0.0)
 {
 	this->output_weights.assign(output_num, Connection());
 }
@@ -19,17 +20,45 @@ void Neuron::FeedForward(const Layer& previous_layer)
 {
 	for (int neuron_index = 0; neuron_index < previous_layer.size(); ++neuron_index)
 	{
-		this->value += previous_layer[neuron_index].value * previous_layer[neuron_index].output_weights[this->neuron_index].weight;
+		this->value += previous_layer[neuron_index].value * previous_layer[neuron_index].output_weights[this->this_neuron_index].weight;
 	}
 
-	this->value = TransferFunction(this->value);
+	this->value = Neuron::TransferFunction(this->value);
 }
 
+void Neuron::UpdateOutputLayerGradient(double target_value)
+{
+	double loss = target_value - this->value;
+	this->gradient = loss * Neuron::TransferFunctionDerv(this->value);
+}
+
+void Neuron::UpdateHiddenLayerGradient(const Layer& next_layer)
+{
+	//sum of derivative of weight
+	double sum_DOW = 0.0;
+	for (int neuron_index = 0; neuron_index < next_layer.size() - 1; ++neuron_index)
+	{
+		sum_DOW += this->output_weights[neuron_index].weight * next_layer[neuron_index].gradient;
+	}
+
+	this->gradient = sum_DOW * Neuron::TransferFunctionDerv(this->value);
+}
+
+void Neuron::UpdateLayerWeight(Layer& prev_layer)
+{
+	for (Neuron& prev_neuron : prev_layer)
+	{
+		double old_diff_weight = prev_neuron.output_weights[this->this_neuron_index].diff_weight;
+		double new_diff_weight = prev_neuron.value * this->gradient * LEARNING_RATE + old_diff_weight * MOMENTUM_RATE;
+
+		prev_neuron.output_weights[this->this_neuron_index].diff_weight = new_diff_weight;
+		prev_neuron.output_weights[this->this_neuron_index].weight += new_diff_weight;
+	}
+}
 
 double Neuron::TransferFunction(double value)
 {
 	//sigmoid 1.0 / (1.0 - std::exp(-value))
-
 	return tanh(value);
 }
 
