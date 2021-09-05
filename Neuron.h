@@ -22,8 +22,8 @@ public:
 	void UpdateLayerWeight(Layer& prev_layer);
 
 private:
-	static constexpr double LEARNING_RATE = 0.01; //eta
-	static constexpr double MOMENTUM_RATE = 0.1; //alpha
+	static constexpr double LEARNING_RATE = 0.15; //eta
+	static constexpr double MOMENTUM_RATE = 0.5; //alpha
 	static double TransferFunction(double value);
 	static double TransferFunctionDerv(double value);
 };

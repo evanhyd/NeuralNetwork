@@ -8,9 +8,9 @@ int main()
 	/*
 	
 
-	5000
-	5
-	1 100 100 100 1
+	3000
+	3
+	2 10 1
 
 
 	*/
@@ -26,7 +26,7 @@ int main()
 	}
 
 	NeuralNetwork model(topology);
-	std::vector<double> input(topology.front()), target(topology.back()), predict;
+	std::vector<double> input(topology.front()), target, predict;
 
 	for (int i = 0; i < M; ++i)
 	{
@@ -34,14 +34,18 @@ int main()
 
 		for (int j = 0; j < input.size(); ++j)
 		{
-			input[j] = double(rand() % 360);
+			input[j] = rand() % 2;
 			std::cout << "input: " << input[j]<<"   ";
 		}
+
+		//clear the target very imporatn lol xd lmao
+		target.assign(topology.back(), 0);
 		for (int j = 0; j < input.size(); ++j)
 		{
-			target.front() = sin(input[j] / 180.0 * 3.1415926535);
+			target.front() = int(target.front()) ^ int(input[j]);
 		}
 		std::cout << "target: " << target.front() << " ";
+
 
 		model.FeedForward(input);
 		predict = model.GetResult();

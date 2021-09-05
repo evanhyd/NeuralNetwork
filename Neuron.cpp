@@ -18,6 +18,7 @@ double Neuron::GetValue() const
 
 void Neuron::FeedForward(const Layer& previous_layer)
 {
+	this->value = 0.0;
 	for (int neuron_index = 0; neuron_index < previous_layer.size(); ++neuron_index)
 	{
 		this->value += previous_layer[neuron_index].value * previous_layer[neuron_index].output_weights[this->this_neuron_index].weight;

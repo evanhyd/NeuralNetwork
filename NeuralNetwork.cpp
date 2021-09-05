@@ -21,7 +21,7 @@ NeuralNetwork::NeuralNetwork(const std::vector<int>& topology) : RMS(0.0)
 	}
 
 	//set bias neuron's value to 1
-	//this->layers.back().back().SetValue(1.0);
+	this->layers.back().back().SetValue(1.0);
 }
 
 
