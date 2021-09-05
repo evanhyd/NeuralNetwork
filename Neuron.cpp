@@ -16,12 +16,13 @@ double Neuron::GetValue() const
 	return this->value;
 }
 
-void Neuron::FeedForward(const Layer& previous_layer)
+void Neuron::FeedForwardFrom(const Layer& previous_layer)
 {
 	this->value = 0.0;
-	for (int neuron_index = 0; neuron_index < previous_layer.size(); ++neuron_index)
+
+	for (const Neuron& prev_neuron : previous_layer)
 	{
-		this->value += previous_layer[neuron_index].value * previous_layer[neuron_index].output_weights[this->this_neuron_index].weight;
+		this->value += prev_neuron.value * prev_neuron.output_weights[this->this_neuron_index].weight;
 	}
 
 	this->value = Neuron::TransferFunction(this->value);
@@ -66,5 +67,5 @@ double Neuron::TransferFunction(double value)
 double Neuron::TransferFunctionDerv(double value)
 {
 	double tanh_value = tanh(value);
-	return 1 - tanh_value * tanh_value;
+	return 1.0 - tanh_value * tanh_value;
 }

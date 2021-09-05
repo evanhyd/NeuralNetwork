@@ -16,7 +16,7 @@ public:
 	Neuron(int neuron_index, int output_num);
 	void SetValue(double new_value);
 	double GetValue() const;
-	void FeedForward(const Layer& previous_layer);
+	void FeedForwardFrom(const Layer& previous_layer);
 	void UpdateOutputLayerGradient(double target_value);
 	void UpdateHiddenLayerGradient(const Layer& next_layer);
 	void UpdateLayerWeight(Layer& prev_layer);

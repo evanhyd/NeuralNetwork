@@ -13,24 +13,25 @@ NeuralNetwork::NeuralNetwork(const std::vector<int>& topology) : RMS(0.0)
 		//populate the new layer with neurons
 		//plus equal for an extra bias neuron
 
-		int output_num = (layer_index + 1 == topology.size() ? 1 : topology[layer_index + 1]);
+		int output_num = (layer_index == topology.size() - 1 ? 0 : topology[layer_index + 1]);
 		for (int neuron_index = 0; neuron_index <= topology[layer_index]; ++neuron_index)
 		{
 			this->layers.back().push_back(Neuron(neuron_index, output_num));
 		}
-	}
 
-	//set bias neuron's value to 1
-	this->layers.back().back().SetValue(1.0);
+		//set bias neuron's value to 1
+		this->layers.back().back().SetValue(1.0);
+	}
 }
 
 
 void NeuralNetwork::ForwardPropagate(const std::vector<double>& input)
 {
-	//-1 to account for the bias neuron
-	assert(input.size() == this->layers.front().size() - 1);
-
 	Layer& input_layer = this->layers.front();
+
+	//-1 to account for the bias neuron
+	assert(input.size() == input_layer.size() - 1);
+
 	for (int neuron_index = 0; neuron_index < input.size(); ++neuron_index)
 	{
 		input_layer[neuron_index].SetValue(input[neuron_index]);
@@ -39,12 +40,13 @@ void NeuralNetwork::ForwardPropagate(const std::vector<double>& input)
 	//forward propagate
 	for (int layer_index = 1; layer_index < this->layers.size(); ++layer_index)
 	{
+		Layer& curr_layer = this->layers[layer_index];
 		const Layer& previous_layer = this->layers[layer_index - 1];
 
-		//-1 to skip the bias neuron
-		for (int neuron_index = 0; neuron_index < this->layers[layer_index].size() - 1; ++neuron_index)
+		//feedforward all non-bias neurons
+		for (int neuron_index = 0; neuron_index < curr_layer.size() - 1; ++neuron_index)
 		{
-			this->layers[layer_index][neuron_index].FeedForward(previous_layer);
+			curr_layer[neuron_index].FeedForwardFrom(previous_layer);
 		}
 	}
 }

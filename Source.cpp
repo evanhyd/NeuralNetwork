@@ -1,77 +1,62 @@
 #include "NeuralNetwork.h"
 #include <vector>
 #include <iostream>
+#include <fstream>
 
 int main()
 {
-
-	/*
-	
-
-	1000
-	3
-	2 4 1
-
-
-	*/
-
 	std::cin.tie(nullptr)->sync_with_stdio(false);
-	srand(time(nullptr));
 
-	int N, M; std::cin >> M >> N;
-	std::vector<int> topology(N);
+	std::ifstream input_file("training.txt");
+	if (!input_file.is_open())
+	{
+		std::cerr << "Couldn't find the training data\n";
+		return EXIT_FAILURE;
+	}
+
+	int layer_num; input_file >> layer_num;
+	std::vector<int> topology(layer_num);
 	for (auto& val : topology)
 	{
-		std::cin >> val;
+		input_file >> val;
 	}
 
 	NeuralNetwork model(topology);
-	std::vector<double> input(topology.front()), target, predict;
+	std::vector<double> features(topology.front()), labels(topology.back()), predict;
 
-	for (int i = 0; i < M; ++i)
+
+	int test_case = 0;
+	while (!input_file.eof())
 	{
-		std::cout << "Training: " << i << " / " << M << '\n';
-
-		for (int j = 0; j < input.size(); ++j)
+		std::cout <<"Test case: " << ++test_case << '\n';
+		for (auto& feature : features)
 		{
-			input[j] = j;
-			std::cout << "input: " << input[j]<<"   ";
+			input_file >> feature;
+			std::cout << "f: " << feature << "   ";
 		}
 
-		//clear the target very imporatn lol xd lmao
-		target.assign(topology.back(), 0);
-		for (int j = 0; j < input.size(); ++j)
+		for (auto& label : labels)
 		{
-			target.front() = int(target.front()) ^ int(input[j]);
+			input_file >> label;
 		}
-		 std::cout << "target: " << target.front() << " ";
+		std::cout << "l: " << labels.front() << " ";
 
 
-
-		model.ForwardPropagate(input);
-		predict = model.GetResult();
-		std::cout << "predict: ";
-		for (auto val : predict)
-		{
-			std::cout << val << ' ';
-		}
-
-
-
-		model.BackPropagate(target);
+		model.ForwardPropagate(features);
+		model.BackPropagate(labels);
 	}
 	std::cout << "Training completed!\n";
 
 	while (true)
 	{
 		std::cout << "Input data:\n";
-		for (auto& i : input)
+		for (auto& i : features)
 		{
 			std::cin >> i;
 		}
 
 
-		model.ForwardPropagate(input);
+		model.ForwardPropagate(features);
 		predict = model.GetResult();
 		std::cout << "predict:\n";
 		for (auto val : predict)
