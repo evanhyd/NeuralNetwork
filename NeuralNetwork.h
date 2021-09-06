@@ -12,8 +12,8 @@ private:
 
 public:
 	NeuralNetwork(const std::vector<int>& topology);
-	void ForwardPropagate(const std::vector<double>& input);
-	void BackPropagate(const std::vector<double>& target);
+	void ForwardPropagate(const std::vector<double>& features);
+	void BackPropagate(const std::vector<double>& labeled_examples);
 	std::vector<double> GetResult() const;
 
 };

@@ -22,7 +22,7 @@ int main()
 	}
 
 	NeuralNetwork model(topology);
-	std::vector<double> features(topology.front()), labels(topology.back()), predict;
+	std::vector<double> features(topology.front()), labeled_examples(topology.back()), predict;
 
 
 	int test_case = 0;
@@ -35,15 +35,15 @@ int main()
 			std::cout << "f: " << feature << "   ";
 		}
 
-		for (auto& label : labels)
+		for (auto& label : labeled_examples)
 		{
 			input_file >> label;
 		}
-		std::cout << "l: " << labels.front() << " ";
+		std::cout << "l: " << labeled_examples.front() << " ";
 
 
 		model.ForwardPropagate(features);
-		model.BackPropagate(labels);
+		model.BackPropagate(labeled_examples);
 	}
 	std::cout << "Training completed!\n";
 

@@ -67,5 +67,5 @@ double Neuron::TransferFunction(double value)
 double Neuron::TransferFunctionDerv(double value)
 {
 	double tanh_value = tanh(value);
-	return 1.0 - tanh_value * tanh_value;
+	return 1.0 - value * value;
 }

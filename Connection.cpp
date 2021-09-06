@@ -3,10 +3,7 @@
 #include <ctime>
 
 
-Connection::Connection()
+Connection::Connection() : diff_weight(0.0)
 {
-	srand(time(nullptr));
-
-	this->weight = rand() / double(RAND_MAX);
-	this->diff_weight = rand() / double(RAND_MAX);
+	this->weight = double(rand()) / double(RAND_MAX);
 }
