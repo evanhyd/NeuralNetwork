@@ -5,8 +5,6 @@
 
 int main()
 {
-	std::cin.tie(nullptr)->sync_with_stdio(false);
-
 	std::ifstream input_file("training.txt");
 	if (!input_file.is_open())
 	{
@@ -14,7 +12,9 @@ int main()
 		return EXIT_FAILURE;
 	}
 
-	int layer_num; input_file >> layer_num;
+	int layer_num;
+	input_file >> layer_num;
+
 	std::vector<int> topology(layer_num);
 	for (auto& val : topology)
 	{
@@ -24,28 +24,33 @@ int main()
 	NeuralNetwork model(topology);
 	std::vector<double> features(topology.front()), labeled_examples(topology.back()), predict;
 
-
-	int test_case = 0;
-	while (!input_file.eof())
+	if (!model.LoadNeuralNetwork("test.nn"))
 	{
-		std::cout <<"Test case: " << ++test_case << '\n';
-		for (auto& feature : features)
+		int test_case = 0;
+		while (!input_file.eof())
 		{
-			input_file >> feature;
-			std::cout << "f: " << feature << "   ";
+			std::cout << "Test case: " << ++test_case << '\n';
+			for (auto& feature : features)
+			{
+				input_file >> feature;
+				std::cout << "f: " << feature << "   ";
+			}
+
+			for (auto& label : labeled_examples)
+			{
+				input_file >> label;
+			}
+			std::cout << "l: " << labeled_examples.front() << " ";
+
+
+			model.ForwardPropagate(features);
+			model.BackPropagate(labeled_examples);
 		}
-
-		for (auto& label : labeled_examples)
-		{
-			input_file >> label;
-		}
-		std::cout << "l: " << labeled_examples.front() << " ";
-
-
-		model.ForwardPropagate(features);
-		model.BackPropagate(labeled_examples);
+		model.SaveNeuralNetwork("test.nn");
+		std::cout <<"RMS: " << model.GetRMS() << '\n';
+		std::cout << "Training completed!\n";
 	}
-	std::cout << "Training completed!\n";
+	
 
 	while (true)
 	{

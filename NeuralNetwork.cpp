@@ -1,5 +1,6 @@
 #include "NeuralNetwork.h"
 #include <iostream>
+#include <fstream>
 #include <cassert>
 
 NeuralNetwork::NeuralNetwork(const std::vector<int>& topology) : RMS(0.0)
@@ -68,8 +69,6 @@ void NeuralNetwork::BackPropagate(const std::vector<double>& labled_examples)
 	this->RMS /= double(output_layer.size() - 1);
 	this->RMS = sqrt(RMS);
 
-	std::cout << "RMS: " << this->RMS << '\n';
-
 	//calculate the output layer gradient
 	for (int neuron_index = 0; neuron_index < output_layer.size() - 1; ++neuron_index)
 	{
@@ -115,4 +114,42 @@ std::vector<double> NeuralNetwork::GetResult() const
 	}
 
 	return results;
+}
+
+double NeuralNetwork::GetRMS() const
+{
+	return this->RMS;
+}
+
+
+void NeuralNetwork::SaveNeuralNetwork(const std::string& file_name) const
+{
+	std::ofstream output(file_name, std::ofstream::trunc | std::ofstream::binary);
+
+	for (const Layer& layer : this->layers)
+	{
+		for (const Neuron& neuron : layer)
+		{
+			output.write(reinterpret_cast<const char*>(neuron.output_weights.data()), neuron.output_weights.size() * sizeof(Connection));
+		}
+	}
+
+	output.close();
+}
+
+bool NeuralNetwork::LoadNeuralNetwork(const std::string& file_name)
+{
+	std::ifstream input(file_name, std::ifstream::binary);
+	if (!input.is_open()) return false;
+
+	for (Layer& layer : this->layers)
+	{
+		for (Neuron& neuron : layer)
+		{
+			input.read(reinterpret_cast<char*>(neuron.output_weights.data()), neuron.output_weights.size() * sizeof(Connection));
+		}
+	}
+
+	input.close();
+	return true;
 }

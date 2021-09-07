@@ -1,4 +1,5 @@
 #include "Neuron.h"
+#include "NeuralNetwork.h"
 #include <algorithm>
 #include <iostream>
 
@@ -15,6 +16,7 @@ double Neuron::GetValue() const
 {
 	return this->value;
 }
+
 
 void Neuron::FeedForwardFrom(const Layer& previous_layer)
 {
@@ -67,5 +69,5 @@ double Neuron::TransferFunction(double value)
 double Neuron::TransferFunctionDerv(double value)
 {
 	double tanh_value = tanh(value);
-	return 1.0 - value * value;
+	return 1.0 - tanh_value * tanh_value;
 }

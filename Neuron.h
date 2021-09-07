@@ -1,6 +1,9 @@
 #pragma once
-#include <vector>
 #include "Connection.h"
+#include <vector>
+#include <string>
+
+class NeuralNetwork;
 
 class Neuron
 {
@@ -16,6 +19,7 @@ public:
 	Neuron(int neuron_index, int output_num);
 	void SetValue(double new_value);
 	double GetValue() const;
+
 	void FeedForwardFrom(const Layer& previous_layer);
 	void UpdateOutputLayerGradient(double target_value);
 	void UpdateHiddenLayerGradient(const Layer& next_layer);
@@ -26,5 +30,7 @@ private:
 	static constexpr double MOMENTUM_RATE = 0.3; //alpha
 	static double TransferFunction(double value);
 	static double TransferFunctionDerv(double value);
+
+	friend NeuralNetwork;
 };
 
