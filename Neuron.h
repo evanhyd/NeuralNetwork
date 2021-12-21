@@ -10,10 +10,10 @@ class Neuron
 	using Layer = std::vector<Neuron>;
 
 private:
-	int this_neuron_index;
-	double value;
-	std::vector<Connection> output_weights;
-	double gradient;
+	int index_;
+	double value_;
+	std::vector<Connection> output_weights_;
+	double gradient_;
 
 public:
 	Neuron(int neuron_index, int output_num);

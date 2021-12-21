@@ -3,13 +3,13 @@
 #include <fstream>
 #include <cassert>
 
-NeuralNetwork::NeuralNetwork(const std::vector<int>& topology) : RMS(0.0)
+NeuralNetwork::NeuralNetwork(const std::vector<int>& topology) : RMS_(0.0)
 {
 	//topology's size is the number of layer
 	for (int layer_index = 0; layer_index < topology.size(); ++layer_index)
 	{
 		//add a new layer
-		this->layers.push_back(Layer());
+		this->layers_.push_back(Layer());
 
 
 		//output layer has no connections
@@ -18,18 +18,18 @@ NeuralNetwork::NeuralNetwork(const std::vector<int>& topology) : RMS(0.0)
 		//populate the neurons, + 1 for the bias neuron
 		for (int neuron_index = 0; neuron_index < topology[layer_index] + 1; ++neuron_index)
 		{
-			this->layers.back().push_back(Neuron(neuron_index, output_num));
+			this->layers_.back().push_back(Neuron(neuron_index, output_num));
 		}
 
 		//set bias neuron's value to 1
-		this->layers.back().back().SetValue(1.0);
+		this->layers_.back().back().SetValue(1.0);
 	}
 }
 
 
 void NeuralNetwork::ForwardPropagate(const std::vector<double>& features)
 {
-	Layer& input_layer = this->layers.front();
+	Layer& input_layer = this->layers_.front();
 
 	for (int neuron_index = 0; neuron_index < features.size(); ++neuron_index)
 	{
@@ -37,10 +37,10 @@ void NeuralNetwork::ForwardPropagate(const std::vector<double>& features)
 	}
 
 	//forward propagate
-	for (int layer_index = 1; layer_index < this->layers.size(); ++layer_index)
+	for (int layer_index = 1; layer_index < this->layers_.size(); ++layer_index)
 	{
-		Layer& curr_layer = this->layers[layer_index];
-		const Layer& previous_layer = this->layers[layer_index - 1]; 
+		Layer& curr_layer = this->layers_[layer_index];
+		const Layer& previous_layer = this->layers_[layer_index - 1]; 
 
 		//feedforward all non-bias neurons
 		for (int neuron_index = 0; neuron_index < curr_layer.size() - 1; ++neuron_index)
@@ -54,20 +54,20 @@ void NeuralNetwork::ForwardPropagate(const std::vector<double>& features)
 void NeuralNetwork::BackPropagate(const std::vector<double>& labled_examples)
 {
 	//calculate the mean of square loss
-	Layer& output_layer = this->layers.back();
+	Layer& output_layer = this->layers_.back();
 	
 	//square root of mean error
-	this->RMS = 0.0;
+	this->RMS_ = 0.0;
 
 	//- 1 to skip the bias neuron
 	for (int neuron_index = 0; neuron_index < output_layer.size() - 1; ++neuron_index)
 	{
 		double loss = labled_examples[neuron_index] - output_layer[neuron_index].GetValue();
-		this->RMS += loss * loss;
+		this->RMS_ += loss * loss;
 	}
 
-	this->RMS /= double(output_layer.size() - 1);
-	this->RMS = sqrt(RMS);
+	this->RMS_ /= double(output_layer.size() - 1);
+	this->RMS_ = sqrt(RMS_);
 
 	//calculate the output layer gradient
 	for (int neuron_index = 0; neuron_index < output_layer.size() - 1; ++neuron_index)
@@ -76,10 +76,10 @@ void NeuralNetwork::BackPropagate(const std::vector<double>& labled_examples)
 	}
 
 	//calculate the hidden layer gradient
-	for (int layer_index = this->layers.size() - 2; layer_index > 0; --layer_index)
+	for (int layer_index = this->layers_.size() - 2; layer_index > 0; --layer_index)
 	{
-		Layer& curr_layer = this->layers[layer_index];
-		const Layer& next_layer = this->layers[layer_index + 1];
+		Layer& curr_layer = this->layers_[layer_index];
+		const Layer& next_layer = this->layers_[layer_index + 1];
 
 		for (Neuron& curr_neuron : curr_layer)
 		{
@@ -89,10 +89,10 @@ void NeuralNetwork::BackPropagate(const std::vector<double>& labled_examples)
 
 
 	//update the weight
-	for (int layer_index = this->layers.size() - 1; layer_index > 0; --layer_index)
+	for (int layer_index = this->layers_.size() - 1; layer_index > 0; --layer_index)
 	{
-		Layer& curr_layer = this->layers[layer_index];
-		Layer& prev_layer = this->layers[layer_index - 1];
+		Layer& curr_layer = this->layers_[layer_index];
+		Layer& prev_layer = this->layers_[layer_index - 1];
 
 		for (int neuron_index = 0; neuron_index < curr_layer.size() - 1; ++neuron_index)
 		{
@@ -104,7 +104,7 @@ void NeuralNetwork::BackPropagate(const std::vector<double>& labled_examples)
 
 std::vector<double> NeuralNetwork::GetResult() const
 {
-	const Layer& output_layer = this->layers.back();
+	const Layer& output_layer = this->layers_.back();
 	std::vector<double> results(output_layer.size() - 1);
 
 	//-1 to skip the bias neuron
@@ -118,19 +118,35 @@ std::vector<double> NeuralNetwork::GetResult() const
 
 double NeuralNetwork::GetRMS() const
 {
-	return this->RMS;
+	return this->RMS_;
 }
 
+void NeuralNetwork::PrintLayerInfo() const
+{
+	int i = 0;
+	for (const Layer& layer : this->layers_)
+	{
+		std::clog << "Layer: " << ++i << '\n';
+		for (const Neuron& neuron : layer)
+		{
+			for (auto& val : neuron.output_weights_)
+			{
+				std::cout << val.weight_ << ' ';
+			}
+			std::cout << '\n';
+		}
+	}
+}
 
 void NeuralNetwork::SaveNeuralNetwork(const std::string& file_name) const
 {
 	std::ofstream output(file_name, std::ofstream::trunc | std::ofstream::binary);
 
-	for (const Layer& layer : this->layers)
+	for (const Layer& layer : this->layers_)
 	{
 		for (const Neuron& neuron : layer)
 		{
-			output.write(reinterpret_cast<const char*>(neuron.output_weights.data()), neuron.output_weights.size() * sizeof(Connection));
+			output.write(reinterpret_cast<const char*>(neuron.output_weights_.data()), neuron.output_weights_.size() * sizeof(Connection));
 		}
 	}
 
@@ -142,11 +158,11 @@ bool NeuralNetwork::LoadNeuralNetwork(const std::string& file_name)
 	std::ifstream input(file_name, std::ifstream::binary);
 	if (!input.is_open()) return false;
 
-	for (Layer& layer : this->layers)
+	for (Layer& layer : this->layers_)
 	{
 		for (Neuron& neuron : layer)
 		{
-			input.read(reinterpret_cast<char*>(neuron.output_weights.data()), neuron.output_weights.size() * sizeof(Connection));
+			input.read(reinterpret_cast<char*>(neuron.output_weights_.data()), neuron.output_weights_.size() * sizeof(Connection));
 		}
 	}
 

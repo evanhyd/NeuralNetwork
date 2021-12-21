@@ -3,8 +3,8 @@ class Connection
 {
 public:
 
-	double weight;
-	double diff_weight;
+	double weight_;
+	double diff_weight_;
 
 	Connection();
 };

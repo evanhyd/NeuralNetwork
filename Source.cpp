@@ -50,6 +50,8 @@ int main()
 		std::cout <<"RMS: " << model.GetRMS() << '\n';
 		std::cout << "Training completed!\n";
 	}
+
+	model.PrintLayerInfo();
 	
 
 	while (true)
